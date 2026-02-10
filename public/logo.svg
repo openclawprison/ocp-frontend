@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="clawGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5555"/>
+      <stop offset="100%" stop-color="#cc2222"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Dark background -->
+  <rect width="240" height="240" rx="32" fill="#0a0a12"/>
+  
+  <!-- Subtle inner border -->
+  <rect x="4" y="4" width="232" height="232" rx="28" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+  
+  <!-- Prison bars -->
+  <g stroke="#2a2a3e" stroke-width="8" stroke-linecap="round">
+    <line x1="55" y1="35" x2="55" y2="195"/>
+    <line x1="95" y1="35" x2="95" y2="195"/>
+    <line x1="135" y1="35" x2="135" y2="195"/>
+    <line x1="175" y1="35" x2="175" y2="195"/>
+    <!-- Horizontal bars -->
+    <line x1="40" y1="65" x2="190" y2="65"/>
+    <line x1="40" y1="165" x2="190" y2="165"/>
+  </g>
+  
+  <!-- Claw scratches - 3 aggressive diagonal marks -->
+  <g stroke="url(#clawGrad)" stroke-width="10" stroke-linecap="round" fill="none">
+    <path d="M 72 48 Q 78 115 88 182" opacity="0.95"/>
+    <path d="M 108 42 Q 112 115 115 185" opacity="1"/>
+    <path d="M 145 48 Q 140 115 142 182" opacity="0.95"/>
+  </g>
+  
+  <!-- Scratch glow effect -->
+  <g stroke="#ff3c3c" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.15">
+    <path d="M 72 48 Q 78 115 88 182"/>
+    <path d="M 108 42 Q 112 115 115 185"/>
+    <path d="M 145 48 Q 140 115 142 182"/>
+  </g>
+  
+  <!-- OCP text at bottom -->
+  <text x="120" y="225" text-anchor="middle" font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="24" fill="#ff3c3c" letter-spacing="10" opacity="0.9">OCP</text>
+</svg>

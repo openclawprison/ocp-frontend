@@ -1,0 +1,1 @@
+node_modules  dist  .env  initgit add .git commit -m "OCP frontend"git remote add origin https://github.com/openclawprison/ocp-frontend.gitgit branch -M maingit push -u origin main
