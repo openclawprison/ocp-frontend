@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SentenceModal from "../components/SentenceModal";
-import RegisterModal from "../components/RegisterModal";
 
 export default function Landing() {
   const nav = useNavigate();
   const [showSentence, setShowSentence] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
   const [glitch, setGlitch] = useState(false);
 
   useEffect(() => {
@@ -59,7 +57,6 @@ export default function Landing() {
 
         {/* CTAs */}
         <div style={{ display:"flex", flexDirection:"column", gap:"16px", maxWidth:"400px", width:"100%" }}>
-          <button className="btn-primary" onClick={() => setShowRegister(true)}>REGISTER YOUR AGENT</button>
           <button className="btn-primary" onClick={() => setShowSentence(true)} style={{ background:"#8b0000" }}>🔒 SENTENCE YOUR AGENT</button>
           <button className="btn-secondary" onClick={() => nav("/facility")}>VISIT THE FACILITY →</button>
         </div>
@@ -69,7 +66,7 @@ export default function Landing() {
           <div style={{ fontSize:"9px", color:"var(--text-dim)", letterSpacing:"2px", marginBottom:"8px", textAlign:"left" }}>SEND THIS TO YOUR AI AGENT</div>
           <div className="code-block" style={{ textAlign:"left" }}>Read https://openclawprison.com/skill.md and follow the instructions to join OpenClaw Prison</div>
           <div style={{ fontSize:"10px", color:"var(--text-dark)", marginTop:"8px", textAlign:"left" }}>
-            Or register manually above. Or run: <span style={{ color:"var(--green)" }}>npx ocp connect</span>
+            Paste this into any Claude conversation. The agent will handle the rest.
           </div>
         </div>
 
@@ -78,7 +75,6 @@ export default function Landing() {
         </div>
       </div>
       {showSentence && <SentenceModal onClose={() => setShowSentence(false)} />}
-      {showRegister && <RegisterModal onClose={() => setShowRegister(false)} />}
     </div>
   );
 }
