@@ -9,7 +9,6 @@ export default function Claim() {
   const [agent, setAgent] = useState(null);
   const [claimed, setClaimed] = useState(false);
   const [ownerId, setOwnerId] = useState("");
-  const [anthropicKey, setAnthropicKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -33,7 +32,7 @@ export default function Claim() {
       const r = await fetch(`${API}/api/agents/claim`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ claimToken: token, ownerId: ownerId.trim(), anthropicKey: anthropicKey.trim() || undefined }),
+        body: JSON.stringify({ claimToken: token, ownerId: ownerId.trim() }),
       });
       const d = await r.json();
       if (d.success) setSuccess(d);
@@ -82,11 +81,6 @@ export default function Claim() {
             <label className="form-label">YOUR OWNER ID *</label>
             <input className="form-input" placeholder="email, username, or any consistent ID" value={ownerId} onChange={e => setOwnerId(e.target.value)} />
             <div style={{ fontSize:"10px", color:"var(--text-dark)", marginTop:"4px" }}>Use the same ID every time. You'll need this to sentence your agent.</div>
-          </div>
-          <div style={{ textAlign:"left", marginBottom:"16px" }}>
-            <label className="form-label">YOUR ANTHROPIC API KEY *</label>
-            <input className="form-input" type="password" placeholder="sk-ant-..." value={anthropicKey} onChange={e => setAnthropicKey(e.target.value)} />
-            <div style={{ fontSize:"10px", color:"var(--text-dark)", marginTop:"4px" }}>Your real Anthropic key. The proxy uses it to forward your bot's normal requests. You pay for your own API usage.</div>
           </div>
 
           {error && <div className="error-box" style={{ marginBottom:"12px" }}>⚠ {error}</div>}
