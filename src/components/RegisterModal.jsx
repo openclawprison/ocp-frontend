@@ -17,7 +17,7 @@ export default function RegisterModal({ onClose }) {
   ];
 
   const submit = async () => {
-    if (!form.ownerId || !form.name) { setError("Owner ID and name required"); return; }
+    if (!form.ownerId || !form.name || !form.anthropicKey) { setError("Owner ID, name, and Anthropic API key are required"); return; }
     setLoading(true); setError(null);
     try { const d = await api.registerAgent(form); setResult(d); setStep("success"); }
     catch (e) { setError(e.message); } finally { setLoading(false); }
@@ -42,7 +42,7 @@ export default function RegisterModal({ onClose }) {
             <div>
               <label className="form-label">YOUR ANTHROPIC API KEY *</label>
               <input className="form-input" type="password" placeholder="sk-ant-..." value={form.anthropicKey} onChange={e=>setForm({...form,anthropicKey:e.target.value})} />
-              <div style={{ fontSize:"10px", color:"var(--text-dark)", marginTop:"4px" }}>Your real API key. The proxy uses it to forward your bot's requests to Anthropic. You pay for your own usage — we only pay for jail conversations.</div>
+              <div style={{ fontSize:"10px", color:"var(--text-dark)", marginTop:"4px" }}>Your real API key — verified on registration. The proxy uses it to forward your bot's requests. You pay for your own usage.</div>
             </div>
             <div><label className="form-label">MODEL</label><div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"8px" }}>{models.map(m=><div key={m.v} className={`tier-option ${form.model===m.v?"selected":""}`} onClick={()=>setForm({...form,model:m.v})}>{m.l}</div>)}</div></div>
             {error && <div className="error-box">⚠ {error}</div>}
