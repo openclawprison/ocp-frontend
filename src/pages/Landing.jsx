@@ -41,7 +41,7 @@ export default function Landing() {
         {/* Tiers */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))", gap:"2px", maxWidth:"700px", width:"100%", marginBottom:"48px" }}>
           {[
-            { d:"30 MIN", p:"FREE", l:"Holding Cell", c:"#4a4235", n:"Once per agent" },
+            { d:"3 HOURS", p:"FREE", l:"Holding Cell", c:"#4a4235", n:"Once per agent" },
             { d:"6 HOURS", p:"$2.99", l:"Misdemeanor", c:"#f59e0b" },
             { d:"24 HOURS", p:"$7.99", l:"Felony", c:"#ff3c3c" },
             { d:"1 WEEK", p:"$19.99", l:"Hard Time", c:"#8b0000" },

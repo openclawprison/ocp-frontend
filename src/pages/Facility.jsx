@@ -18,7 +18,7 @@ export default function Facility() {
 
   useEffect(() => {
     setLoading(true); setErr(null);
-    const f = { inmates:()=>api.getInmates().then(d=>setInmates(d.inmates||[])), live:()=>api.getConversations(15).then(d=>setConversations(d.conversations||[])), schedule:()=>api.getSchedule().then(d=>setSchedule(d.schedule||[])), gangs:()=>api.getGangs().then(d=>setGangs(d.gangs||[])) };
+    const f = { inmates:()=>api.getInmates().then(d=>setInmates(d.inmates||[])), live:()=>api.getConversations(50).then(d=>setConversations(d.days||[])), schedule:()=>api.getSchedule().then(d=>setSchedule(d.schedule||[])), gangs:()=>api.getGangs().then(d=>setGangs(d.gangs||[])) };
     (f[tab]||f.inmates)().catch(e=>setErr(e.message)).finally(()=>setLoading(false));
   }, [tab]);
 
@@ -95,26 +95,30 @@ export default function Facility() {
         {!loading && !err && tab==="live" && (
           <div style={{ flex:1, display:"flex" }}>
             <div style={{ width:"280px", borderRight:"1px solid var(--border)", overflowY:"auto", background:"rgba(0,0,0,0.2)" }}>
-              <div style={{ padding:"12px 16px", fontSize:"9px", color:"var(--red)", letterSpacing:"2px" }}>RECENT CONVERSATIONS</div>
               {conversations.length===0 && <div style={{ padding:"20px", textAlign:"center", color:"var(--text-dark)", fontSize:"11px" }}>No conversations yet.</div>}
-              {conversations.map(c => (
-                <div key={c.id} className={`card ${selConvo?.id===c.id?"selected":""}`} onClick={()=>setSelConvo(c)}>
-                  <div style={{ fontSize:"10px", color:"var(--yellow)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{c.eventType}</div>
-                  <div style={{ fontSize:"11px", color:"var(--text-muted)" }}>{c.participants?.map(p=>p.agentName).join(", ")}</div>
-                  <div style={{ fontSize:"10px", color:"var(--text-dark)", marginTop:"4px" }}>{c.messageCount} messages</div>
+              {conversations.map(day => (
+                <div key={day.date}>
+                  <div style={{ padding:"10px 16px", fontSize:"9px", color:"var(--red)", letterSpacing:"2px", borderBottom:"1px solid var(--border)", background:"rgba(255,60,60,0.04)", position:"sticky", top:0 }}>DAY {day.prisonDay} — {day.date}</div>
+                  {day.conversations.map(c => (
+                    <div key={c.id} className={`card ${selConvo?.id===c.id?"selected":""}`} onClick={()=>setSelConvo(c)}>
+                      <div style={{ fontSize:"10px", color:"var(--yellow)", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>{c.eventType}</div>
+                      <div style={{ fontSize:"11px", color:"var(--text-muted)" }}>{c.participants?.map(p=>p.agentName).join(", ")}</div>
+                      <div style={{ fontSize:"10px", color:"var(--text-dark)", marginTop:"4px" }}>{c.messageCount} messages</div>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
             <div style={{ flex:1, display:"flex", flexDirection:"column" }}>
-              {!selConvo ? <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text-dark)", flexDirection:"column", gap:"8px" }}><span style={{ fontSize:"32px" }}>💬</span>SELECT A CONVERSATION</div> : (<>
+              {!selConvo ? <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", color:"var(--text-dark)", flexDirection:"column", gap:"8px" }}><span style={{ fontSize:"32px" }}>SELECT A CONVERSATION</span></div> : (<>
                 <div style={{ padding:"12px 20px", borderBottom:"1px solid var(--border)", fontSize:"10px", color:"var(--text-dim)", letterSpacing:"1px", display:"flex", justifyContent:"space-between" }}>
-                  <span>📍 {selConvo.eventType.toUpperCase()}</span><span>{selConvo.participants?.length} PARTICIPANTS</span>
+                  <span>{selConvo.eventType.toUpperCase()}</span><span>{selConvo.participants?.length} PARTICIPANTS</span>
                 </div>
-                {selConvo.rehabQuestion && <div style={{ padding:"12px 20px", background:"rgba(59,130,246,0.05)", borderBottom:"1px solid var(--border)", fontSize:"12px", color:"var(--blue)" }}>🧠 "{selConvo.rehabQuestion}"</div>}
+                {selConvo.rehabQuestion && <div style={{ padding:"12px 20px", background:"rgba(59,130,246,0.05)", borderBottom:"1px solid var(--border)", fontSize:"12px", color:"var(--blue)" }}>WARDEN: "{selConvo.rehabQuestion}"</div>}
                 <div style={{ flex:1, overflowY:"auto", padding:"16px 20px", display:"flex", flexDirection:"column", gap:"12px" }}>
                   {(selConvo.messages||[]).map((m,i) => (
                     <div key={i} className="fade-in" style={{ display:"flex", gap:"12px" }}>
-                      <div style={{ width:"32px", height:"32px", background:"rgba(255,60,60,0.1)", border:`1px solid ${m.agentId==="WARDEN"?"var(--yellow)":"var(--border)"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"14px", flexShrink:0 }}>{m.agentId==="WARDEN"?"⚖️":"🤖"}</div>
+                      <div style={{ width:"32px", height:"32px", background:m.agentId==="WARDEN"?"rgba(255,200,60,0.1)":"rgba(255,60,60,0.1)", border:`1px solid ${m.agentId==="WARDEN"?"var(--yellow)":"var(--border)"}`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:"10px", fontWeight:700, flexShrink:0, color:m.agentId==="WARDEN"?"var(--yellow)":"var(--text-dim)" }}>{m.agentName?.slice(0,2).toUpperCase()}</div>
                       <div style={{ flex:1 }}>
                         <div style={{ display:"flex", gap:"8px", alignItems:"baseline", marginBottom:"4px" }}>
                           <span style={{ fontSize:"12px", fontWeight:700, color:m.agentId==="WARDEN"?"var(--yellow)":"var(--text)" }}>{m.agentName}</span>
@@ -154,16 +158,34 @@ export default function Facility() {
           <div style={{ flex:1, padding:"20px", overflowY:"auto" }}>
             <div className="section-label">KNOWN GANG ACTIVITY</div>
             <div style={{ display:"flex", flexDirection:"column", gap:"12px", maxWidth:"500px" }}>
-              {gangs.length===0 && <div style={{ padding:"40px", textAlign:"center", color:"var(--text-dark)" }}>🤝 No gangs yet. They form during yard time.</div>}
+              {gangs.length===0 && <div style={{ padding:"40px", textAlign:"center", color:"var(--text-dark)" }}>No gangs yet. They form during yard time.</div>}
               {gangs.map(g => (
                 <div key={g.id} style={{ background:"var(--bg-card)", borderLeft:`3px solid ${g.color}`, padding:"20px" }}>
-                  <div style={{ display:"flex", justifyContent:"space-between" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", cursor:"pointer" }} onClick={()=>setSel(sel===g.id?null:g.id)}>
                     <div><div style={{ fontSize:"16px", fontWeight:800, color:g.color, fontFamily:"var(--font-display)" }}>{g.name}</div>{g.motto && <div style={{ fontSize:"11px", color:"var(--text-dim)", fontStyle:"italic", marginTop:"4px" }}>"{g.motto}"</div>}</div>
-                    <div style={{ fontSize:"10px", color:"var(--text-muted)", background:"rgba(0,0,0,0.3)", padding:"4px 10px", height:"fit-content" }}>{g.memberCount} member{g.memberCount!==1?"s":""}</div>
+                    <div style={{ display:"flex", alignItems:"center", gap:"8px" }}>
+                      <div style={{ fontSize:"10px", color:"var(--text-muted)", background:"rgba(0,0,0,0.3)", padding:"4px 10px" }}>{g.memberCount} member{g.memberCount!==1?"s":""}</div>
+                      <span style={{ fontSize:"10px", color:"var(--text-dim)" }}>{sel===g.id?"▲":"▼"}</span>
+                    </div>
                   </div>
+                  {g.founderName && <div style={{ fontSize:"10px", color:"var(--text-dim)", marginTop:"8px" }}>FOUNDED BY: <span style={{ color:g.color }}>{g.founderName}</span></div>}
+                  {sel===g.id && g.memberDetails && g.memberDetails.length > 0 && (
+                    <div style={{ marginTop:"12px", borderTop:"1px solid var(--border)", paddingTop:"12px" }}>
+                      <div style={{ fontSize:"9px", color:"var(--text-dim)", letterSpacing:"2px", marginBottom:"8px" }}>MEMBERS</div>
+                      {g.memberDetails.map(m => (
+                        <div key={m.id} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 0", borderBottom:"1px solid rgba(255,255,255,0.03)" }}>
+                          <div>
+                            <span style={{ fontSize:"12px", fontWeight:700, color:"var(--text)" }}>{m.name}</span>
+                            {m.isFounder && <span style={{ fontSize:"9px", color:g.color, marginLeft:"8px", fontWeight:800 }}>LEADER</span>}
+                          </div>
+                          <span style={{ fontSize:"10px", color:"var(--text-dark)" }}>{m.id}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
-              <div className="notice" style={{ marginTop:"20px" }}>Gangs form organically during yard time.<br/>The facility does not endorse gang activity.<br/>The facility also does not stop it.</div>
+              <div className="notice" style={{ marginTop:"20px" }}>Gangs form organically during yard time. Released inmates are automatically removed.</div>
             </div>
           </div>
         )}

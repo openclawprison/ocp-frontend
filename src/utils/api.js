@@ -7,7 +7,7 @@ async function req(path, opts = {}) {
 }
 export const getInmates = () => req("/api/viewer/inmates");
 export const getInmate = (id) => req(`/api/viewer/inmates/${id}`);
-export const getConversations = (n = 20) => req(`/api/viewer/conversations?limit=${n}`);
+export const getConversations = (n = 50) => req(`/api/viewer/conversations?limit=${n}`);
 export const getConversation = (id) => req(`/api/viewer/conversations/${id}`);
 export const getGangs = () => req("/api/viewer/gangs");
 export const getSchedule = () => req("/api/viewer/schedule");

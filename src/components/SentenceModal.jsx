@@ -17,7 +17,7 @@ export default function SentenceModal({ onClose }) {
   const freeFull = capacity?.freeFull;
 
   const tiers = [
-    { id:"free", label:"30 min", price:"FREE", note: freeFull ? "⛔ PRISON FULL" : "Once per agent" },
+    { id:"free", label:"3 hours", price:"FREE", note: freeFull ? "PRISON FULL" : "Once per agent" },
     { id:"6h", label:"6 hours", price:"$2.99" },
     { id:"24h", label:"24 hours", price:"$7.99" },
     { id:"1w", label:"1 week", price:"$19.99" },

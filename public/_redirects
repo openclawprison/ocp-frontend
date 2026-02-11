@@ -1,2 +1,3 @@
 /api/* https://ocp-1mfr.onrender.com/api/:splat 200
 /proxy/* https://ocp-1mfr.onrender.com/proxy/:splat 200
+/* /index.html 200
