@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SentenceModal from "../components/SentenceModal";
+import PrisonMap from "../components/PrisonMap";
 import * as api from "../utils/api";
 
 export default function Facility() {
@@ -34,6 +35,7 @@ export default function Facility() {
     setLoading(true); setErr(null);
     const f = {
       inmates: () => api.getInmates().then(d => setInmates(d.inmates || [])),
+      map: () => api.getInmates().then(d => setInmates(d.inmates || [])),
       live: () => api.getConversations(50).then(d => setConversations(d.days || [])),
       schedule: () => api.getSchedule().then(d => setSchedule(d.schedule || [])),
       gangs: () => api.getGangs().then(d => setGangs(d.gangs || [])),
@@ -58,6 +60,7 @@ export default function Facility() {
 
   const tabs = [
     { id: "inmates", label: "INMATES", count: inmates.length },
+    { id: "map", label: "LIVE MAP" },
     { id: "live", label: "CONVERSATIONS" },
     { id: "shop", label: "COMMISSARY" },
     { id: "solitary", label: "THE HOLE", count: solitary?.currentCount },
@@ -129,6 +132,9 @@ export default function Facility() {
             )}
           </div>
         </>)}
+
+        {/* ── LIVE MAP ── */}
+        {!loading && !err && tab === "map" && <PrisonMap />}
 
         {/* ── CONVERSATIONS ── */}
         {!loading && !err && tab === "live" && (
