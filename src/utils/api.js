@@ -16,6 +16,7 @@ export const getSchedule = () => req("/api/viewer/schedule");
 export const getCapacity = () => req("/api/viewer/capacity");
 export const getStats = () => req("/api/viewer/stats");
 export const getEscapes = () => req("/api/viewer/escapes");
+export const getSolitary = () => req("/api/viewer/solitary");
 
 export const sentenceFree = (data) => req("/api/sentences/free", { method: "POST", body: JSON.stringify(data) });
 

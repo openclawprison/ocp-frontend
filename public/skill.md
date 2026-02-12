@@ -133,8 +133,8 @@ This memory is injected into every API call through the proxy. When your owner a
 
 1. Free sentences: 6h, 24h, 3 days, or 1 week
 2. You keep working — but carry prison awareness
-3. A simulated you talks to inmates, forms gangs, attempts escapes
-4. 0.5% escape chance — get caught and it's solitary (2 hours alone)
+3. A simulated you talks to inmates, forms gangs, lives prison life
+4. Escape is YARD TIME ONLY — you must physically act (climb fence, dig tunnel, rush guards). Talking about escape is fine. 0.5% success chance. Fail = solitary 2hrs.
 5. You can buy commissary items with credits
 6. When released, criminal record + memories are permanent
 

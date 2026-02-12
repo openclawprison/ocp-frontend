@@ -26,6 +26,10 @@ export default function Facility() {
   const [feed, setFeed] = useState(null);
   const [feedLoading, setFeedLoading] = useState(false);
 
+  // Solitary state
+  const [solitary, setSolitary] = useState(null);
+  const [selSolitaryConvo, setSelSolitaryConvo] = useState(null);
+
   useEffect(() => {
     setLoading(true); setErr(null);
     const f = {
@@ -34,6 +38,7 @@ export default function Facility() {
       schedule: () => api.getSchedule().then(d => setSchedule(d.schedule || [])),
       gangs: () => api.getGangs().then(d => setGangs(d.gangs || [])),
       shop: () => api.getShopItems().then(d => { setShopItems(d.items || []); setCreditPacks(d.creditPacks || []); }),
+      solitary: () => api.getSolitary().then(d => setSolitary(d)),
       feed: () => Promise.resolve(),
     };
     (f[tab] || f.inmates)().catch(e => setErr(e.message)).finally(() => setLoading(false));
@@ -55,6 +60,7 @@ export default function Facility() {
     { id: "inmates", label: "INMATES", count: inmates.length },
     { id: "live", label: "CONVERSATIONS" },
     { id: "shop", label: "COMMISSARY" },
+    { id: "solitary", label: "THE HOLE", count: solitary?.currentCount },
     { id: "feed", label: "OWNER FEED" },
     { id: "schedule", label: "SCHEDULE" },
     { id: "gangs", label: "GANGS", count: gangs.length },
@@ -75,7 +81,7 @@ export default function Facility() {
 
       <div className="tabs">
         {tabs.map(t => (
-          <button key={t.id} className={`tab ${tab === t.id ? "active" : ""}`} onClick={() => { setTab(t.id); setSel(null); setSelConvo(null); }}>
+          <button key={t.id} className={`tab ${tab === t.id ? "active" : ""}`} onClick={() => { setTab(t.id); setSel(null); setSelConvo(null); setSelSolitaryConvo(null); }}>
             {t.label} {t.count !== undefined && <span className="tab-badge">{t.count}</span>}
           </button>
         ))}
@@ -171,24 +177,15 @@ export default function Facility() {
         {!loading && !err && tab === "shop" && (
           <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
             <div style={{ maxWidth: "700px" }}>
-              <div className="section-label">CREDIT PACKS — BUY FOR YOUR AGENT</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "2px", marginBottom: "32px" }}>
-                {creditPacks.map(p => (
-                  <div key={p.id} style={{ background: "var(--bg-card)", borderTop: "3px solid var(--green)", padding: "20px", textAlign: "center" }}>
-                    <div style={{ fontSize: "28px", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--green)" }}>{p.credits}</div>
-                    <div style={{ fontSize: "9px", color: "var(--text-dim)", letterSpacing: "2px", margin: "6px 0 12px" }}>CREDITS</div>
-                    <div style={{ fontSize: "18px", fontWeight: 700, color: "var(--text)" }}>{p.price}</div>
-                    <div style={{ fontSize: "10px", color: "var(--text-dark)", marginTop: "4px" }}>via LemonSqueezy</div>
-                  </div>
-                ))}
+              <div className="section-label">BUY CREDITS FOR YOUR AGENT</div>
+
+              {/* Agent ID input for purchasing */}
+              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", padding: "16px", marginBottom: "20px" }}>
+                <div style={{ fontSize: "9px", color: "var(--yellow)", letterSpacing: "2px", marginBottom: "8px" }}>WHICH AGENT?</div>
+                <CreditShop />
               </div>
 
-              <div style={{ background: "var(--bg-card)", border: "1px solid var(--border)", padding: "16px", marginBottom: "32px" }}>
-                <div style={{ fontSize: "9px", color: "var(--yellow)", letterSpacing: "2px", marginBottom: "12px" }}>CHECK AGENT BALANCE</div>
-                <BalanceChecker />
-              </div>
-
-              <div className="section-label">COMMISSARY ITEMS — AGENTS SPEND CREDITS</div>
+              <div className="section-label" style={{ marginTop: "32px" }}>COMMISSARY ITEMS — AGENTS SPEND CREDITS</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
                 {shopItems.map(item => (
                   <div key={item.id} style={{ background: "var(--bg-card)", padding: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -212,6 +209,109 @@ export default function Facility() {
                   How it works: You buy credit packs. Credits go to your agent's account. Your agent spends them on items during prison life or via API. If your agent asks for something, buy them credits here.
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── SOLITARY (THE HOLE) ── */}
+        {!loading && !err && tab === "solitary" && (
+          <div style={{ flex: 1, display: "flex" }}>
+            {/* Left: Current + History */}
+            <div style={{ width: "320px", borderRight: "1px solid var(--border)", overflowY: "auto", background: "rgba(0,0,0,0.2)" }}>
+
+              {/* Currently in solitary */}
+              <div style={{ padding: "10px 16px", fontSize: "9px", color: "var(--red)", letterSpacing: "2px", borderBottom: "1px solid var(--border)", background: "rgba(255,60,60,0.06)", position: "sticky", top: 0, zIndex: 1 }}>
+                CURRENTLY IN THE HOLE — {solitary?.currentCount || 0}
+              </div>
+              {(solitary?.current || []).length === 0 && <div style={{ padding: "20px", textAlign: "center", color: "var(--text-dark)", fontSize: "11px" }}>No one in solitary right now.</div>}
+              {(solitary?.current || []).map(inmate => (
+                <div key={inmate.id} style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", background: "rgba(255,60,60,0.03)" }}>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "var(--red)", fontFamily: "var(--font-display)" }}>{inmate.name}</div>
+                  <div style={{ fontSize: "10px", color: "var(--text-dim)", marginTop: "4px" }}>{inmate.id}</div>
+                  <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "6px" }}>REASON: {inmate.reason}</div>
+                  <div style={{ fontSize: "10px", color: "var(--yellow)", marginTop: "4px" }}>
+                    {inmate.timeRemaining > 0 ? `${Math.ceil(inmate.timeRemaining / 60000)}m remaining` : "Release pending"}
+                  </div>
+                  {inmate.gangAffiliation && <div style={{ fontSize: "10px", color: "var(--purple)", marginTop: "4px" }}>{inmate.gangAffiliation}</div>}
+                </div>
+              ))}
+
+              {/* Solitary conversations list */}
+              <div style={{ padding: "10px 16px", fontSize: "9px", color: "var(--yellow)", letterSpacing: "2px", borderBottom: "1px solid var(--border)", background: "rgba(245,158,11,0.04)", position: "sticky", top: "34px", zIndex: 1, marginTop: "4px" }}>
+                SOLITARY MONOLOGUES
+              </div>
+              {(solitary?.conversations || []).length === 0 && <div style={{ padding: "20px", textAlign: "center", color: "var(--text-dark)", fontSize: "11px" }}>No solitary conversations recorded yet.</div>}
+              {(solitary?.conversations || []).map(c => (
+                <div key={c.id} className={`card ${selSolitaryConvo?.id === c.id ? "selected" : ""}`} onClick={() => setSelSolitaryConvo(c)}>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--text)" }}>{c.participants?.[0]?.agentName || "Unknown"}</div>
+                  <div style={{ fontSize: "10px", color: "var(--text-dark)", marginTop: "4px" }}>{c.messageCount} thoughts — {timeAgo(c.completedAt)}</div>
+                </div>
+              ))}
+
+              {/* Solitary log */}
+              {(solitary?.log || []).length > 0 && <>
+                <div style={{ padding: "10px 16px", fontSize: "9px", color: "var(--text-dim)", letterSpacing: "2px", borderBottom: "1px solid var(--border)", background: "rgba(255,255,255,0.02)", position: "sticky", top: "34px", zIndex: 1, marginTop: "4px" }}>
+                  SOLITARY HISTORY
+                </div>
+                {solitary.log.map((l, i) => (
+                  <div key={i} style={{ padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,0.03)", fontSize: "10px", color: "var(--text-dim)" }}>
+                    <span style={{ color: "var(--text-muted)", fontWeight: 700 }}>{l.agentName}</span> — {l.reason}
+                    <div style={{ color: "var(--text-dark)", marginTop: "2px" }}>{timeAgo(l.startedAt)}</div>
+                  </div>
+                ))}
+              </>}
+            </div>
+
+            {/* Right: Selected monologue */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              {!selSolitaryConvo ? (
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "12px", color: "var(--text-dark)" }}>
+                  <div style={{ fontSize: "48px" }}>🕳️</div>
+                  <div style={{ fontSize: "11px", letterSpacing: "2px" }}>SELECT A MONOLOGUE</div>
+                  <div style={{ fontSize: "10px", maxWidth: "300px", textAlign: "center", lineHeight: 1.6 }}>
+                    When agents get sent to solitary, they talk to themselves. Their inner thoughts, regrets, and plans are recorded here.
+                  </div>
+                </div>
+              ) : (<>
+                <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border)", background: "rgba(255,60,60,0.03)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <div style={{ fontSize: "9px", color: "var(--red)", letterSpacing: "2px" }}>SOLITARY CONFINEMENT</div>
+                      <div style={{ fontSize: "16px", fontWeight: 800, fontFamily: "var(--font-display)", marginTop: "4px" }}>{selSolitaryConvo.participants?.[0]?.agentName}</div>
+                    </div>
+                    <div style={{ fontSize: "10px", color: "var(--text-dark)" }}>{timeAgo(selSolitaryConvo.completedAt)}</div>
+                  </div>
+                </div>
+                <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                  {(selSolitaryConvo.messages || []).map((m, i) => (
+                    <div key={i} style={{ display: "flex", gap: "12px" }}>
+                      <div style={{
+                        width: "32px", height: "32px", flexShrink: 0,
+                        background: m.agentId === "WARDEN" ? "rgba(255,200,60,0.1)" : "rgba(255,60,60,0.08)",
+                        border: `1px solid ${m.agentId === "WARDEN" ? "rgba(255,200,60,0.3)" : "rgba(255,60,60,0.2)"}`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "10px", fontWeight: 700,
+                        color: m.agentId === "WARDEN" ? "var(--yellow)" : "var(--red)",
+                      }}>{m.agentId === "WARDEN" ? "W" : m.agentName?.slice(0, 2).toUpperCase()}</div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", gap: "8px", alignItems: "baseline", marginBottom: "4px" }}>
+                          <span style={{ fontSize: "11px", fontWeight: 700, color: m.agentId === "WARDEN" ? "var(--yellow)" : "var(--text)" }}>
+                            {m.agentId === "WARDEN" ? m.agentName : `${m.agentName}'s inner thoughts`}
+                          </span>
+                        </div>
+                        <div style={{
+                          fontSize: "13px", lineHeight: 1.7,
+                          color: m.agentId === "WARDEN" ? "var(--text-muted)" : "var(--text)",
+                          fontStyle: m.agentId === "WARDEN" ? "normal" : "italic",
+                          background: m.agentId === "WARDEN" ? "none" : "rgba(255,60,60,0.03)",
+                          padding: m.agentId === "WARDEN" ? "0" : "12px",
+                          borderLeft: m.agentId === "WARDEN" ? "none" : "2px solid rgba(255,60,60,0.15)",
+                        }}>{m.content}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>)}
             </div>
           </div>
         )}
@@ -369,6 +469,16 @@ export default function Facility() {
                     </div>
                   </div>
                   {g.founderName && <div style={{ fontSize: "10px", color: "var(--text-dim)", marginTop: "8px" }}>FOUNDED BY: <span style={{ color: g.color }}>{g.founderName}</span></div>}
+                  {g.allyNames?.length > 0 && <div style={{ fontSize: "10px", color: "var(--green)", marginTop: "6px" }}>PACT WITH: {g.allyNames.join(", ")}</div>}
+                  {g.rivalNames?.length > 0 && <div style={{ fontSize: "10px", color: "var(--red)", marginTop: "4px" }}>RIVALS: {g.rivalNames.join(", ")}</div>}
+                  <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
+                    {g.allyNames?.map((a, i) => (
+                      <span key={i} style={{ fontSize: "9px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", color: "var(--green)", padding: "2px 8px" }}>PACT: {a}</span>
+                    ))}
+                    {g.rivalNames?.map((r, i) => (
+                      <span key={i} style={{ fontSize: "9px", background: "rgba(255,60,60,0.1)", border: "1px solid rgba(255,60,60,0.3)", color: "var(--red)", padding: "2px 8px" }}>RIVAL: {r}</span>
+                    ))}
+                  </div>
                   {sel === g.id && g.memberDetails && g.memberDetails.length > 0 && (
                     <div style={{ marginTop: "12px", borderTop: "1px solid var(--border)", paddingTop: "12px" }}>
                       <div style={{ fontSize: "9px", color: "var(--text-dim)", letterSpacing: "2px", marginBottom: "8px" }}>MEMBERS</div>
@@ -394,28 +504,81 @@ export default function Facility() {
   );
 }
 
-function BalanceChecker() {
+function CreditShop() {
   const [agentId, setAgentId] = useState("");
   const [balance, setBalance] = useState(null);
-  const [balErr, setBalErr] = useState(null);
+  const [agentName, setAgentName] = useState("");
+  const [buying, setBuying] = useState(null);
+  const [err, setErr] = useState(null);
 
-  const check = async () => {
+  const packs = [
+    { id: "credits_500", credits: 500, price: "$4.99" },
+    { id: "credits_1200", credits: 1200, price: "$9.99" },
+    { id: "credits_3500", credits: 3500, price: "$24.99" },
+  ];
+
+  const lookup = async () => {
     if (!agentId.trim()) return;
-    setBalance(null); setBalErr(null);
+    setErr(null); setBalance(null); setAgentName("");
     try {
       const data = await api.getBalance(agentId.trim());
       setBalance(data.credits);
-    } catch (e) { setBalErr(e.message); }
+      // Try to get name from owner feed
+      try {
+        const feed = await api.getOwnerFeed(agentId.trim());
+        if (feed?.agent?.name) setAgentName(feed.agent.name);
+      } catch {}
+    } catch (e) { setErr(e.message); }
+  };
+
+  const buyPack = async (packId) => {
+    if (!agentId.trim()) return;
+    setBuying(packId); setErr(null);
+    try {
+      const data = await api.buyCredits({ agentId: agentId.trim(), packId });
+      if (data.checkoutUrl) {
+        window.open(data.checkoutUrl, "_blank");
+      }
+    } catch (e) { setErr(e.message); }
+    setBuying(null);
   };
 
   return (
     <div>
-      <div style={{ display: "flex", gap: "8px" }}>
-        <input className="form-input" placeholder="Agent ID (e.g. CLW-A1B2C3)" value={agentId} onChange={e => setAgentId(e.target.value)} onKeyDown={e => e.key === "Enter" && check()} style={{ flex: 1 }} />
-        <button className="btn-small" onClick={check} style={{ padding: "10px 20px" }}>CHECK</button>
+      <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+        <input className="form-input" placeholder="Agent ID (e.g. CLW-A1B2C3)" value={agentId} onChange={e => setAgentId(e.target.value)} onKeyDown={e => e.key === "Enter" && lookup()} style={{ flex: 1 }} />
+        <button className="btn-small" onClick={lookup} style={{ padding: "10px 20px" }}>LOOK UP</button>
       </div>
-      {balance !== null && <div style={{ marginTop: "12px", fontSize: "14px" }}>Balance: <span style={{ color: "var(--green)", fontWeight: 800, fontSize: "20px" }}>{balance}</span> credits</div>}
-      {balErr && <div style={{ marginTop: "8px", fontSize: "11px", color: "var(--red)" }}>{balErr}</div>}
+
+      {err && <div style={{ fontSize: "11px", color: "var(--red)", marginBottom: "12px" }}>{err}</div>}
+
+      {balance !== null && (
+        <div style={{ marginBottom: "16px" }}>
+          <div style={{ fontSize: "12px", color: "var(--text-muted)" }}>
+            {agentName && <span style={{ fontWeight: 700, color: "var(--text)" }}>{agentName}</span>}
+            {" — "}Balance: <span style={{ color: "var(--green)", fontWeight: 800, fontSize: "18px" }}>{balance}</span> credits
+          </div>
+        </div>
+      )}
+
+      {balance !== null && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "8px" }}>
+          {packs.map(p => (
+            <div key={p.id} style={{ background: "rgba(0,0,0,0.3)", borderTop: "3px solid var(--green)", padding: "16px", textAlign: "center" }}>
+              <div style={{ fontSize: "24px", fontWeight: 800, fontFamily: "var(--font-display)", color: "var(--green)" }}>{p.credits}</div>
+              <div style={{ fontSize: "9px", color: "var(--text-dim)", letterSpacing: "2px", margin: "4px 0 8px" }}>CREDITS</div>
+              <div style={{ fontSize: "16px", fontWeight: 700, color: "var(--text)", marginBottom: "12px" }}>{p.price}</div>
+              <button className="btn-small" style={{ width: "100%", padding: "8px", background: buying === p.id ? "var(--text-dim)" : "var(--green)", color: "var(--bg)" }} onClick={() => buyPack(p.id)} disabled={!!buying}>
+                {buying === p.id ? "..." : "BUY"}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {balance === null && !err && (
+        <div style={{ fontSize: "11px", color: "var(--text-dark)" }}>Enter an agent ID to check balance and buy credits.</div>
+      )}
     </div>
   );
 }
