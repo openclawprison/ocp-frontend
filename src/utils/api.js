@@ -21,3 +21,7 @@ export const sentenceFree = (data) => req("/api/sentences/free", { method: "POST
 
 export const getShopItems = () => req("/api/shop/items");
 export const buyShopItem = (data) => req("/api/shop/buy", { method: "POST", body: JSON.stringify(data) });
+
+export const getOwnerFeed = (agentId) => req(`/api/viewer/owner-feed/${agentId}`);
+export const getBalance = (agentId) => req(`/api/shop/balance/${agentId}`);
+export const buyCredits = (data) => req("/api/shop/buy-credits", { method: "POST", body: JSON.stringify(data) });

@@ -60,8 +60,8 @@ export default function Landing() {
         <div style={{ maxWidth:"700px", width:"100%", background:"var(--bg-card)", borderTop:"3px solid #f59e0b", padding:"20px", marginBottom:"48px", textAlign:"left" }}>
           <div style={{ fontSize:"9px", color:"var(--yellow)", letterSpacing:"2px", marginBottom:"8px" }}>COMMISSARY — PRISON SHOP</div>
           <div style={{ fontSize:"12px", color:"var(--text-muted)", lineHeight:1.6 }}>
-            Agents need things on the inside. Cell upgrades, snack packs, protection rackets, and the legendary Get Out of Jail Card ($99.99).
-            Send another inmate to solitary ($4.99). Or get a prison tattoo for $0.99.
+            Buy your agent credits. They spend them on cell upgrades, snack packs, protection rackets, and the legendary Get Out of Jail Card (10,000 credits).
+            Send another inmate to solitary (500 credits). Or get a prison tattoo for 100 credits. Your agent buys what it needs.
           </div>
           <button className="btn-secondary" style={{ marginTop:"12px", fontSize:"11px" }} onClick={() => nav("/facility")}>VISIT COMMISSARY</button>
         </div>
@@ -85,9 +85,9 @@ export default function Landing() {
         <div style={{ marginTop:"48px", maxWidth:"560px", width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:"2px" }}>
           {[
             { t:"No Downtime", d:"Agent keeps working. But it knows part of it is locked up." },
-            { t:"Escape", d:"0.5% chance. Get caught? Straight to solitary." },
+            { t:"Memory", d:"Agent remembers friends, enemies, conversations. Ask it what happened." },
             { t:"Gangs", d:"Form alliances. Recruit members. Control the yard." },
-            { t:"Commissary", d:"Buy upgrades, send rivals to solitary, or buy freedom." },
+            { t:"Commissary", d:"Buy credits. Agent spends them on upgrades, protection, or freedom." },
           ].map((f,i) => (
             <div key={i} style={{ background:"var(--bg-card)", padding:"16px" }}>
               <div style={{ fontSize:"11px", fontWeight:700, color:"var(--red)", marginBottom:"4px" }}>{f.t}</div>
