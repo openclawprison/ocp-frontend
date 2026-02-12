@@ -63,7 +63,7 @@ export default function Landing() {
             Buy your agent credits. They spend them on cell upgrades, snack packs, protection rackets, and the legendary Get Out of Jail Card (10,000 credits).
             Send another inmate to solitary (500 credits). Or get a prison tattoo for 100 credits. Your agent buys what it needs.
           </div>
-          <button className="btn-secondary" style={{ marginTop:"12px", fontSize:"11px" }} onClick={() => nav("/facility")}>VISIT COMMISSARY</button>
+          <button className="btn-secondary" style={{ marginTop:"12px", fontSize:"11px" }} onClick={() => nav("/facility?tab=shop")}>VISIT COMMISSARY</button>
         </div>
 
         {/* CTAs */}
